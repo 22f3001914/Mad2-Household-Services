@@ -1,0 +1,74 @@
+Terminal 1:
+python app.py
+
+Terminal 2:
+celery -A app:celery_app worker -l INFO
+
+Terminal 3:
+~/go/bin/MailHog
+
+Terminal 4:
+celery -A app:celery_app beat -l INFO
+
+Terminal 5:
+sudo service redis-server start 
+
+Terminal 6:
+
+
+
+    async mounted() {
+        const user = JSON.parse(localStorage.getItem('user'));
+        if (user && user.token) {
+            const res = await fetch(location.origin + "/api/services", {
+                headers: {
+                    'Authentication-Token': user.token
+                }
+            });
+
+            if (res.ok) {
+                const data = await res.json();
+                this.services = data;
+
+            }
+        } else {
+            console.warn('User not logged in or token not available');
+        }
+    }
+
+
+
+
+
+
+    Register Page 
+    export default {
+    template: `
+        <div>
+              <input placeholder="email" v-model="email"/>
+              <input placeholder="password" v-model="password"/>
+              <input placeholder="role" v-model="role"/>
+              <button @click="submitRegister"> Register </button>
+        </div>
+        `,
+    data() {
+      return {
+        email: null,
+        password: null,
+        role: null,
+      };
+    },
+    methods: {
+      async submitRegister() {
+        const res = await fetch(location.origin + "/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: this.email, password: this.password , role: [this.role]}),
+        });
+        if (res.ok) {
+          console.log("We are register");
+        }
+      },
+    },
+  };
+  

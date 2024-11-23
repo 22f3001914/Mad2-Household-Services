@@ -1,0 +1,17 @@
+id,service_id,customer_id,professional_id,date_of_request,date_of_completion,service_status,remarks,rating
+1,1,1,3,2024-11-09T22:59:22.271730,,assigned,Assigned to professional,5
+2,1,1,2,2024-11-14T19:09:07.872708,,requested,Need service ASAP,
+3,1,1,2,2024-11-14T19:09:07.872708,,requested,Need service ASAP,
+4,1,1,2,2024-11-14T19:09:07.872708,,requested,Need service ASAP,
+5,1,1,2,2024-11-14T19:09:07.872708,,requested,Need service ASAP,
+6,1,1,2,2024-11-14T19:09:07.872708,,requested,Need service ASAP,
+7,1,1,,2024-11-14T19:38:03.750538,,requested,,
+8,1,1,,2024-11-14T19:38:03.750538,,requested,,
+9,1,1,,2024-11-14T19:38:03.750538,,requested,,
+10,1,1,,2024-11-14T19:38:03.750538,,requested,,
+11,1,2,,2024-11-14T19:38:03.750538,,requested,,
+12,1,2,,2024-11-14T19:38:03.750538,,requested,,
+13,1,2,,2024-11-17T19:24:33.282816,,requested,,
+14,3,1,,2024-11-18T12:48:18.678923,,requested,,
+15,5,4,,2024-11-21T17:13:50.327220,,requested,,
+16,5,4,,2024-11-21T17:13:50.327220,,requested,,
