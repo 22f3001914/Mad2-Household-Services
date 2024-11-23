@@ -11,8 +11,8 @@ import os
 datastore = app.security.datastore
 cache = app.cache
 
-IMAGE_UPLOAD_FOLDER = 'source/images'
-RESUME_UPLOAD_FOLDER = 'source/resume'
+IMAGE_UPLOAD_FOLDER = 'frontend/static/images'
+RESUME_UPLOAD_FOLDER = 'frontend/static/resume'
 os.makedirs(IMAGE_UPLOAD_FOLDER, exist_ok=True)
 os.makedirs(RESUME_UPLOAD_FOLDER, exist_ok=True)
 
@@ -83,8 +83,11 @@ def register():
     user = datastore.find_user(email=email)
     if user:
         return jsonify({"message": "User Already Exists!"}), 404
-
+    active = True
+    status = "Active"
     if role_name == 'professional':
+        active = False
+        status = "Pending Approval"
         if not all([name, description, service_type, experience, location, image, resume]):
             return jsonify({"message": "All fields are required for professional role"}), 404
     
@@ -103,7 +106,7 @@ def register():
         datastore.create_user(
             email=email,
             password=hash_password(password),
-            active=False,
+            active=active,
             roles=[role_name],
             name=name,
             description=description,
@@ -112,7 +115,7 @@ def register():
             location=location,
             image=image_filename,
             resume=resume_filename,
-            status = "Pending Approval"
+            status = status
         )
         db.session.commit()
         return jsonify({"Message": "Registration successful"}), 200

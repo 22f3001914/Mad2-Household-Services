@@ -11,13 +11,13 @@ export default{
       </ul>
     </div>
     <div class="badge-container">
-      <img src="..static/static/images/promise.png" alt="Badge" class="badge">
+      <img src="../static/static/images/promise.png" alt="Badge" class="badge">
     </div>
   </div>`,
   data() {
     return {
       company,
     };
-  }
+  },
 
 }

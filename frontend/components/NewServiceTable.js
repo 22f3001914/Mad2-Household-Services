@@ -63,6 +63,7 @@ export default {
 
     closeModal() {
       this.showModal = false; // Close the modal
+      this.fetchServices();
     },
     closeEditModal(updatedService) {
       this.showEditModal = false;
@@ -73,8 +74,9 @@ export default {
     if (index !== -1) {
       this.$set(this.services, index, updatedService); // Reactively update service
     }
-  }
+  } this.fetchServices();
     },
+
   },
   computed: {
     filteredServices() {
@@ -123,7 +125,7 @@ export default {
       <!-- Custom Modal -->
       <div v-if="showModal" class="custom-modal" >
         <div class="custom-modal-content">
-        <button class="custom-modal-close" @click="closeEditModal(null)">&times;</button>
+        <button class="custom-modal-close" @click="closeModal">&times;</button>
 
           <!-- Render the AddServiceForm component here -->
           <AddServiceForm @service-added="closeModal" />

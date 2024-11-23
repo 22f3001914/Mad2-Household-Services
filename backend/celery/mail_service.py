@@ -14,7 +14,7 @@ class MailConfig:
     SENDER_EMAIL = 'influeverse@gmail.com'
     SENDER_PASSWORD = 'ovhq dhis hnef nbme'
 
-def send_email(to, subject, content, config = DummyMailConfig):
+def send_email(to, subject, content, config = MailConfig):
     msg = MIMEMultipart()
     msg['To'] = to
     msg['Subject'] = subject

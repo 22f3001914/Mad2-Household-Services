@@ -15,9 +15,9 @@ with app.app_context():
     if not userdatastore.find_user(email='user01@study.iitm.ac.in'):
         userdatastore.create_user(email='user01@study.iitm.ac.in', password=hash_password('pass'), roles=['user'])
 
-    if not userdatastore.find_user(email='professional01@study.iitm.ac.in'):
+    if not userdatastore.find_user(email='sp01@gmail.com'):
         userdatastore.create_user(
-            email='professional01@study.iitm.ac.in',
+            email='sp01@gmail.com',
             password=hash_password('pass'),
             fs_uniquifier='unique-identifier-professional01',  # Ensure this is unique
             roles=['professional'],

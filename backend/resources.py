@@ -19,6 +19,10 @@ service_fields = {
     'description': fields.String,
     'date_created': fields.DateTime,
     'image': fields.String,
+    'average_rating': fields.Float,
+    'num_ratings': fields.Integer,
+    'num_requests': fields.Integer,
+    'mrp': fields.Float,
 }
 
 # Define the structure for marshaling ServiceRequest fields
@@ -103,7 +107,7 @@ class ServiceAPI(Resource):
         file_name = None
         if image:
             file_name = secure_filename(image.filename)
-            image.save(os.path.join('source/images', secure_filename(image.filename)))
+            image.save(os.path.join('frontend/static/images', secure_filename(image.filename)))
         service = Service(name=name, base_price=base_price, time_required=time_required, description=description, image=file_name)
         db.session.add(service)
         db.session.commit()
@@ -132,14 +136,14 @@ class ServiceAPI(Resource):
 
         if image:
             if service.image:
-                old_image_path = os.path.join('source/images', service.image)
+                old_image_path = os.path.join('frontend/static/images', service.image)
                 try:
                     os.remove(old_image_path)
                 except:
                     pass
 
             file_name = secure_filename(image.filename)
-            image.save(os.path.join('source/images', file_name))
+            image.save(os.path.join('frontend/static/images', file_name))
             service.image = file_name
 
         try:
@@ -173,9 +177,15 @@ class ServiceRequestAPI(Resource):
 
         # Only the customer who created the request or admin can delete
         if service_request.customer_id == current_user.id or current_user.is_admin:
-            db.session.delete(service_request)
-            db.session.commit()
-            return {"message": "Service request deleted"}, 200
+            try:
+                db.session.delete(service_request)
+                db.session.commit()
+                return {"message": "Service request deleted"}, 200
+            except Exception as e:
+                db.rollback()
+                return {"message": f"An error occurred: {str(e)}"}, 500
+
+            
         else:
             return {"message": "Unauthorized"}, 403
 
@@ -224,7 +234,29 @@ class ServiceRequestAPI(Resource):
 
 
 
-def notify_professional(service_req_id):
+def notify_professional(service_req_id, professional_id=None):
+    if professional_id:
+        professional = User.query.get(professional_id)
+        if not professional:
+            raise ValueError("Professional not found")
+        if professional.status == "Busy":
+            raise ValueError("Professional is busy")
+        if not professional.active:
+            raise ValueError("Professional is not active")
+        service_request = ServiceRequest.query.get(service_req_id)
+        if not service_request:
+            raise ValueError("Service request not found")
+        if service_request.service.name != professional.service_type:
+            raise ValueError("Professional is not suitable for this service")
+        new_request = ServiceRequestRecord(
+            service_request_id=service_req_id,
+            professional_id=professional_id,
+            status="Pending"
+        )
+        db.session.add(new_request)
+        db.session.commit()
+        return
+    
     service_request = ServiceRequest.query.get(service_req_id)
     if not service_request:
         raise ValueError("Service request not found")
@@ -249,6 +281,7 @@ def notify_professional(service_req_id):
 
 
 
+
 class ServiceRequestRecordAPI(Resource):
     @auth_required('token')
     def get(self):
@@ -265,8 +298,93 @@ class ServiceRequestRecordAPI(Resource):
             for record in records
         ] 
         return jsonify(response_data)
+    
 
-api.add_resource(ServiceRequestRecordAPI, '/service_request_records')
+    @auth_required('token')
+    def put(self, record_id, action):
+
+        if action in ["accept", "reject"]:
+            record = ServiceRequestRecord.query.get(record_id)
+            if not record:
+                return {"message": "Record not found"}, 404
+
+            if record.professional_id != current_user.id:
+                return {"message": "Unauthorized"}, 403
+
+            if action == "accept":
+                record.status = "Accepted"
+                other_records = ServiceRequestRecord.query.filter_by(service_request_id=record.service_request_id).all()
+                for other_record in other_records:
+                    if other_record.id != record_id:
+                        other_record.status = "Expired"
+                professional = User.query.get(current_user.id)
+                professional.status = "Busy"
+                service = ServiceRequest.query.get(record.service_request_id)
+                service.professional_id = current_user.id
+                service.service_status = "Ongoing"
+                db.session.commit()
+                return {"message": "Request accepted"}, 200
+            
+            
+            
+            elif action == "reject":
+                record.status = "Rejected"
+                #Check if all requests are rejected
+                all_rejected = True
+                other_records = ServiceRequestRecord.query.filter_by(service_request_id=record.service_request_id).all()
+                for other_record in other_records:
+                    if other_record.status != "Rejected":
+                        all_rejected = False
+                        break
+                if all_rejected:
+                    service_request = ServiceRequest.query.get(record.service_request_id)
+                    service_request.service_status = "All rejected"
+                db.session.commit()
+                return {"message": "Request rejected"}, 200
+            else:
+                return {"message": "Invalid action"}, 400
+            
+        elif action == "completed":
+            service_id = record_id
+            service = ServiceRequest.query.get(service_id)
+            professional_id = service.professional_id
+            if not service:
+                return {"message": "Service request not found"}, 404
+            records = service.records
+            this_record = None
+            for record in records:
+                if record.service_request_id == service_id and record.professional_id == professional_id:
+                    this_record = record
+                    break
+            user = User.query.get(current_user.id)
+            if user.is_service_professional():
+                user.status = "Active"
+                this_record.status = "Completed"
+            elif user.is_customer():
+                this_record.status = "Completed"
+                service.professional.status = "Active"
+            service.service_status = "Completed"
+            service.date_of_completion = datetime.now()
+            db.session.commit()
+            return {"message": "Request completed"}, 200
+        elif action == "cancel":
+                record = ServiceRequestRecord.query.get(record_id)
+                if not record:
+                    return {"message": "Record not found"}, 404
+                record.status = "Cancelled"
+                other_records = ServiceRequestRecord.query.filter_by(service_request_id=record.service_request_id).all()
+                for other_record in other_records:
+                    if other_record.id != record_id:
+                        other_record.status = "Cancelled"
+                service_request = ServiceRequest.query.get(record.service_request_id)
+                service_request.service_status = "Cancelled"
+                db.session.commit()
+                return {"message": "Request accepted"}, 200
+        else:
+            return {"message": "Invalid action"}, 400
+    
+
+api.add_resource(ServiceRequestRecordAPI, '/service_request_records', '/service_request_records/<int:record_id>/<string:action>')
 
 class ServiceRequestListAPI(Resource): 
     @auth_required('token')
@@ -330,6 +448,33 @@ class GetAllReviewsAndRating(Resource):
 
         return jsonify(response_data)
 
+    @auth_required('token')
+    def put(self, service_id):
+        data = request.get_json()
+        rating = data.get('rating')
+        remarks = data.get('remarks')
+        service_status = 'Reviewed' # Get the new status from the request data, default to 'Reviewed'
+
+        service_request = ServiceRequest.query.get(service_id)
+        if not service_request:
+            return {"message": "Service request not found"}, 404
+
+        service_request.rating = rating
+        service_request.remarks = remarks
+        service_request.service_status = service_status  # Update the service status
+
+        # Find the specific ServiceRequestRecord
+        record = ServiceRequestRecord.query.filter_by(
+            service_request_id=service_id,
+            professional_id=service_request.professional_id
+        ).first()
+        
+        if record:
+            record.status = service_status  # Update the record status to match the service status
+
+        db.session.commit()
+        return {"message": "Review added and status updated"}, 200
+    
  
 class GetAllUser(Resource):
     @auth_required('token')
@@ -365,10 +510,37 @@ class UnBlockUser(Resource):
 
         user.active = True
         user.status = "Active"
+        if user.is_service_professional():
+            service_type = user.service_type
+            #Get all pending service requests for this service type
+            pending_requests = ServiceRequest.query.filter_by(service_status="requested").all()
+            services_of_professional_interest = [request for request in pending_requests if request.service.name == service_type]
+            for service in services_of_professional_interest:
+                notify_professional(service.id, user_id)
+        
         db.session.commit()
         return {"message": "User Unblocked"}, 200
     
+class MyRequestedServicesAPI(Resource):
+    @auth_required('token')
+    def get(self):
+        service_requests = ServiceRequest.query.filter_by(customer_id=current_user.id).all()
+        response_data = [
+            {
+                "id": service_request.id,
+                "service_name": service_request.service.name,
+                "date_of_request": service_request.date_of_request,
+                "service_status": service_request.service_status,
+                "professional_name": service_request.professional.name if service_request.professional else "Not Assigned",
+                "professional_id": service_request.professional_id
+            }
+            for service_request in service_requests
+        ]
+        return jsonify(response_data)    
 
+
+
+api.add_resource(MyRequestedServicesAPI, '/my_requested_services')
 
     
 # Register resources with endpoints

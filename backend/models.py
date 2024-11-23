@@ -32,6 +32,14 @@ class User(db.Model, UserMixin):
 
     def is_customer(self):
         return any(role.name == 'user' for role in self.roles)
+    
+    @property
+    def rating(self):
+        service_requests = ServiceRequest.query.filter_by(professional_id=self.id).all()
+        total_ratings = sum(req.rating for req in service_requests if req.rating is not None)
+        num_ratings = sum(1 for req in service_requests if req.rating is not None)
+        return total_ratings / num_ratings if num_ratings > 0 else 0.0
+        
 
 class Role(db.Model, RoleMixin):
     id = db.Column(db.Integer, primary_key = True)
@@ -62,6 +70,24 @@ class Service(db.Model):
             "description": self.description,
             "image": self.image,
         }
+    
+    @property
+    def average_rating(self):
+        service_requests = ServiceRequest.query.filter_by(service_id=self.id).all()
+        total_ratings = sum(req.rating for req in service_requests if req.rating is not None)
+        num_ratings = sum(1 for req in service_requests if req.rating is not None)
+        return total_ratings / num_ratings if num_ratings > 0 else 0.0
+    @property
+    def num_ratings(self):
+        return sum(1 for req in self.requests if req.rating is not None)
+    
+    @property
+    def num_requests(self):
+        return len(self.requests)
+    
+    @property
+    def mrp(self):
+        return self.base_price * 1.18
     
 
 # ServiceRequest model for tracking requests from customers to service professionals

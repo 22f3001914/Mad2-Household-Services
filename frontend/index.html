@@ -81,7 +81,38 @@ body{
 }
 
 
+.component-container {
+  position: relative; /* Enables the button to be positioned over the image */
+  width: 200px; /* Adjust width as per your requirement */
+  margin: auto; /* Center the component */
+  text-align: center; /* Centers content within */
+}
 
+.component-image {
+  width: 80%; /* Image takes 80% of the container width */
+  border-radius: 8px; /* Rounded corners */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Initial shadow */
+  object-fit: cover; /* Properly scales the image */
+  transition: all 0.3s ease-in-out; /* Smooth transition for hover effect */
+}
+
+.component-image:hover {
+  transform: scale(1.05); /* Slight zoom effect on hover */
+  box-shadow: 0px 8px 12px rgba(0, 0, 0, 0.2); /* Enhance shadow on hover */
+}
+
+.component-button {
+  position: absolute; /* Allows button to overlap the image */
+  top: 98%; /* Adjust to place the button halfway over the image */
+  left: 50%; /* Centers the button horizontally */
+  transform: translate(-50%, -50%); /* Ensures proper centering */
+  padding: 10px 20px; /* Adjust padding for button size */
+  border: none; /* No border */
+  border-radius: 5px; /* Rounded button corners */
+  cursor: pointer; /* Pointer on hover */
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Optional: Button shadow */
+  z-index: 10; /* Keeps the button above the image */
+}
 
 
 
@@ -387,6 +418,246 @@ body{
 .footer-link:hover {
   text-decoration: underline;
 }
+
+
+.sp-profile-card {
+  max-width: 400px;
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-family: Arial, sans-serif;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.sp-profile-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.sp-avatar {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background-color: #ddd;
+  margin-right: 15px;
+}
+
+.sp-profile-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.sp-name {
+  font-size: 1.2em;
+  margin: 0;
+}
+
+.sp-profession {
+  font-size: 0.9em;
+  color: #555;
+  background: #f1f1f1;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-top: 2px;
+}
+
+.sp-rating {
+  display: flex;
+  align-items: center;
+  font-size: 0.9em;
+  margin-top: 5px;
+}
+
+.sp-star {
+  color: gold;
+  margin-right: 5px;
+}
+
+.sp-stats {
+  display: flex;
+  gap: 15px;
+  margin-top: 5px;
+  color: #555;
+  font-size: 0.85em;
+}
+
+.sp-stat {
+  display: flex;
+  align-items: center;
+}
+
+.sp-icon-check, .sp-icon-clock, .sp-icon-location {
+  margin-right: 5px;
+}
+
+.sp-reviews-section {
+  margin-top: 20px;
+}
+
+.sp-reviews-section h3 {
+  font-size: 1.1em;
+  margin-bottom: 10px;
+}
+
+.sp-review {
+  background-color: #f9f9f9;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.sp-review-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85em;
+  color: #666;
+  margin-bottom: 5px;
+}
+
+.sp-review-text {
+  margin: 5px 0;
+}
+
+.sp-like {
+  font-size: 0.8em;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.sp-icon-thumb-up {
+  margin-right: 5px;
+}
+
+.sp-view-reviews-button {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #333;
+  background: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+
+.sp-view-reviews-button:hover {
+  background-color: #f1f1f1;
+}
+
+.sp-book-now-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #333;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 1em;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.sp-book-now-button:hover {
+  background-color: #444;
+}
+
+.rating-modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+      }
+  
+      .rating-modal {
+        background: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        width: 400px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        position: relative;
+      }
+  
+      .rating-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+  
+      .rating-modal-title {
+        font-size: 20px;
+        font-weight: bold;
+        margin: 0;
+      }
+  
+      .rating-modal-close-btn {
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+      }
+  
+      .rating-modal-body {
+        margin-top: 15px;
+      }
+  
+      .rating-modal-description {
+        font-size: 14px;
+        color: #555;
+        margin-bottom: 15px;
+      }
+  
+      .rating-stars {
+        display: flex;
+        gap: 5px;
+        margin-bottom: 15px;
+      }
+  
+      .rating-star {
+        font-size: 24px;
+        cursor: pointer;
+        color: #ccc;
+      }
+  
+      .rating-star-filled {
+        color: #ffcc00;
+      }
+  
+      .rating-textarea {
+        width: 100%;
+        height: 80px;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        resize: none;
+        font-size: 14px;
+      }
+  
+      .rating-modal-footer {
+        text-align: right;
+      }
+  
+      .rating-submit-btn {
+        background-color: #000;
+        color: #fff;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 14px;
+      }
+  
+      .rating-submit-btn:hover {
+        background-color: #333;
+      }
+
+
 
 
 
@@ -1329,5 +1600,11 @@ body{
       integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
       crossorigin="anonymous"
     ></script>
+    <!-- Bootstrap CSS -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+<!-- Bootstrap Bundle with Popper -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
   </body>
 </html>

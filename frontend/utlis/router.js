@@ -10,6 +10,7 @@ import HomePage from "../pages/HomePage.js";
 import CareersPage from "../pages/CareersPage.js";
 import AdminDashboard from "../pages/AdminDashboard.js";
 import ProfessionalDashboard from "../pages/ProfessionalDashboard.js";
+import MyServicesPage from "../pages/MyServicesPage.js";
 const routes = [
     {path : '/', component : HomePage},
     {path : '/login', component : LoginPage},
@@ -18,7 +19,8 @@ const routes = [
     {path : '/admin-dashboard', component : AdminDashboardPage, meta : {requiresLogin : true, role : "admin"}} ,
     {path : '/careers', component : CareersPage},
     {path : '/ad', component : AdminDashboard, meta : {requiresLogin : true, role : "admin"}},
-    {path : '/pd', component : ProfessionalDashboard, meta : {requiresLogin : true, role : "professional"}}
+    {path : '/pd', component : ProfessionalDashboard, meta : {requiresLogin : true, role : "professional"}},
+    {path : '/my-services', component : MyServicesPage, meta : {requiresLogin : true}},
 
 ]
 
