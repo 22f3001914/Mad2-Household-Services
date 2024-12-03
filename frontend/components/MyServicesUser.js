@@ -97,68 +97,69 @@ export default {
   },
   template: `
   <div class="admin-service-table">
-  <div class="admin-header">
-    <input
-      type="text"
-      placeholder="Search requests..."
-      v-model="searchQuery"
-      class="admin-search-bar"
-    />
-  </div>
-  <table class="admin-table">
-    <thead>
-      <tr>
-        <th>Service Name</th>
-        <th>Customer</th>
-        <th>Request Date</th>
-        <th>Professional</th>
-        <th>Status</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr v-for="request in filteredRequests" :key="request.id">
-        <td>{{ request.service_name }}</td>
-        <td>{{ request.customer_name }}</td>
-        <td>{{ new Date(request.date_of_request).toLocaleString() }}</td>
-        <td>{{ request.professional_name || "Not Assigned" }}</td>
-        <td>{{ request.service_status }}</td>
-        <td>
-          <button
-            v-if="request.service_status === 'Ongoing'"
-            @click="closeRequest(request)"
-            class="admin-edit-btn"
-          >
-            Close
-          </button>
-          <button
-            v-if="request.service_status === 'requested'"
-            @click="cancelRequest(request)"
-            class="admin-delete-btn"
-          >
-            Cancel
-          </button>
-          <button
-            v-if="request.service_status === 'Completed'"
-            @click="reviewRequest(request)"
-            class="admin-edit-btn"
-          >
-            Review
-          </button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-
-  <!-- Custom Modal -->
-  <div v-if="showModal" class="custom-modal">
-    <div class="custom-modal-content">
-      <button class="custom-modal-close" @click="closeModal">&times;</button>
-      <!-- Render the RatingForm component here -->
-      <RatingForm :request="selectedRequest" @review-submitted="closeModal" />
+    <div class="admin-header">
+      <input
+        type="text"
+        placeholder="Search requests..."
+        v-model="searchQuery"
+        class="admin-search-bar"
+      />
     </div>
-    <div class="custom-modal-overlay" @click="closeModal"></div>
+    <table class="admin-table">
+      <thead>
+        <tr>
+          <th>Service Name</th>
+          <th>Request Date</th>
+          <th>Professional</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr v-for="request in filteredRequests" :key="request.id">
+          <td>{{ request.service_name }}</td>
+          <td>{{ new Date(request.date_of_request).toLocaleString() }}</td>
+          <td>{{ request.professional_name || "Not Assigned" }}</td>
+          <td>{{ request.service_status }}</td>
+          <td>
+            <button
+              v-if="request.service_status === 'Ongoing'"
+              @click="closeRequest(request)"
+              class="admin-edit-btn"
+            >
+              Close
+            </button>
+            <button
+              v-if="request.service_status === 'requested'"
+              @click="cancelRequest(request)"
+              class="admin-delete-btn"
+            >
+              Cancel
+            </button>
+            <button
+              v-if="request.service_status === 'Completed'"
+              @click="reviewRequest(request)"
+              class="admin-edit-btn"
+            >
+              Review
+            </button>
+          </td>
+        </tr>
+        <tr v-if="filteredRequests.length === 0">
+          <td colspan="6" class="no-data-message">No service requests found.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Custom Modal -->
+    <div v-if="showModal" class="custom-modal">
+      <div class="custom-modal-content">
+        <button class="custom-modal-close" @click="closeModal">&times;</button>
+        <!-- Render the RatingForm component here -->
+        <RatingForm :request="selectedRequest" @review-submitted="closeModal" />
+      </div>
+      <div class="custom-modal-overlay" @click="closeModal"></div>
+    </div>
   </div>
-</div>
   `,
 };

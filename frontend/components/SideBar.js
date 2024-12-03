@@ -14,6 +14,10 @@ export default {
       <i class="bi bi-gear admin-icon"></i>
       <span>Service Management</span>
     </li>
+    <li class="admin-sidebar-item" :class="{ 'admin-active': activePage === 'service-request' }" @click="setActive('service-request')">
+      <i class="bi bi-gear admin-icon"></i>
+      <span>Service Requests</span>
+    </li>
   </ul>
 </div>
   `,

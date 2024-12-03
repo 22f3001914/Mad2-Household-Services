@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .header {
+            background-color: #333;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .section {
+            padding: 20px;
+        }
+        .section h2 {
+            color: #333;
+            margin-top: 0;
+            border-bottom: 2px solid #333;
+            padding-bottom: 5px;
+            font-size: 20px;
+        }
+        .footer {
+            background-color: #f1f1f1;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+        }
+        a {
+            color: #d9534f;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Account Blocked Notification</h1>
+        </div>
+        <div class="section">
+            <h2>Hello {{ user_name }},</h2>
+            <p>We regret to inform you that your account on Home Hero has been <strong>blocked</strong> by our administration team due to a violation of our policies.</p>
+            <p>This decision was made after a thorough review of your account and activities on our platform. As a result, you will no longer be able to access your account or use Home Hero’s services.</p>
+        </div>
+        <div class="section">
+            <h2>Important Information</h2>
+            <ul>
+                <li>Your account has been blocked.</li>
+                <li>If you believe this action was taken in error, please contact our support team for clarification.</li>
+            </ul>
+            <p>Maintaining a safe and trustworthy platform is our top priority, and this decision reflects our commitment to that goal.</p>
+        </div>
+        <div class="footer">
+            <p>If you have any questions or need further assistance, please reach out to our support team at <a href="mailto:support@homehero.com">support@homehero.com</a>.</p>
+            <p><strong>The Home Hero Team</strong></p>
+        </div>
+    </div>
+</body>
+</html>

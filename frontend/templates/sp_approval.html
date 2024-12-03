@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .header {
+            background-color: #333;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .section {
+            padding: 20px;
+        }
+        .section h2 {
+            color: #333;
+            margin-top: 0;
+            border-bottom: 2px solid #333;
+            padding-bottom: 5px;
+            font-size: 20px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        .footer {
+            background-color: #f1f1f1;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Welcome Aboard, {{ professional_name }}!</h1>
+        </div>
+        <div class="section">
+            <h2>Your Application Has Been Approved</h2>
+            <p>Congratulations! Your profile is now fully activated, and you are ready to start providing services on Home Hero. We’re excited to have you on board and look forward to seeing you thrive as a trusted professional.</p>
+        </div>
+        <div class="section">
+            <h2>Get Started with Bookings</h2>
+            <ul>
+                <li><strong>Accept Service Requests:</strong> Log in to your dashboard to view and accept booking requests from customers in your area.</li>
+                <li><strong>Manage Your Schedule:</strong> Update your availability and ensure you are ready to take on bookings that suit your timing.</li>
+                <li><strong>Deliver Quality Services:</strong> Maintain high standards to build a strong reputation and receive positive feedback.</li>
+            </ul>
+            <a href="{{ dashboard_link }}" class="button">View Bookings</a>
+            <p>If you have any questions or need support, our team is here to help. We are committed to your success on Home Hero.</p>
+        </div>
+        <div class="footer">
+            <p>Thank you for choosing Home Hero. We’re excited to work with you and help you achieve success.</p>
+            <p><strong>The Home Hero Team</strong></p>
+        </div>
+    </div>
+</body>
+</html>

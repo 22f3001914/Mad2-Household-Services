@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .header {
+            background-color: #333;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .section {
+            padding: 20px;
+        }
+        .section h2 {
+            color: #333;
+            margin-top: 0;
+            border-bottom: 2px solid #333;
+            padding-bottom: 5px;
+            font-size: 20px;
+        }
+        .footer {
+            background-color: #f1f1f1;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+        }
+        a {
+            color: #d9534f;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Service Details Exported Successfully</h1>
+        </div>
+        <div class="section">
+            <h2>Hello {{ user_name }},</h2>
+            <p>We are pleased to inform you that your service details have been <strong>successfully exported</strong>.</p>
+            <p>You can now access and use the exported information as needed. We hope this enhances your experience with our platform.</p>
+        </div>
+        <div class="section">
+            <h2>Important Information</h2>
+            <ul>
+                <li>Your service details export is complete.</li>
+                <li>If you have any questions or face any issues with the exported data, please don't hesitate to contact our support team.</li>
+            </ul>
+            <p>We are committed to providing you with the best possible service and support.</p>
+        </div>
+        <div class="footer">
+            <p>If you have any questions or need further assistance, please reach out to our support team at <a href="mailto:support@homehero.com">support@homehero.com</a>.</p>
+            <p><strong>The Home Hero Team</strong></p>
+        </div>
+    </div>
+</body>
+</html>

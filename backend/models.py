@@ -1,7 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from flask_security import UserMixin, RoleMixin
 db = SQLAlchemy()
-from datetime import datetime
+from datetime import datetime, timedelta
 
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
@@ -33,12 +33,77 @@ class User(db.Model, UserMixin):
     def is_customer(self):
         return any(role.name == 'user' for role in self.roles)
     
+    
     @property
     def rating(self):
         service_requests = ServiceRequest.query.filter_by(professional_id=self.id).all()
         total_ratings = sum(req.rating for req in service_requests if req.rating is not None)
         num_ratings = sum(1 for req in service_requests if req.rating is not None)
         return total_ratings / num_ratings if num_ratings > 0 else 0.0
+    
+    
+    
+
+    @property
+    def total_users(self):
+        return User.query.count()
+  
+    @property
+    def num_of_sp(self):
+        role = Role.query.filter_by(name='professional').first()
+        return len(role.bearers)
+    
+    @property
+    def num_of_customers(self):
+        role = Role.query.filter_by(name='user').first()
+        return len(role.bearers)
+
+    
+    @property
+    def num_of_services(self):
+        return Service.query.count()
+    @property
+    def num_of_requests(self):
+        return ServiceRequest.query.count()
+    @property
+    def num_of_active_requests(self):
+        return ServiceRequest.query.filter_by(service_status='requested').count()
+    @property
+    def num_of_assigned_requests(self):
+        return ServiceRequest.query.filter_by(service_status='assigned').count()
+    @property
+    def num_of_completed_requests(self):
+        return ServiceRequest.query.filter(ServiceRequest.service_status.in_(['Reviewed', 'Completed'])).count()
+    @property
+    def num_of_reviews(self):
+        return ServiceRequest.query.filter(ServiceRequest.rating.isnot(None)).count()
+    @property
+    def num_of_active_sp(self):
+        return User.query.filter_by(status='Active').count()
+    @property
+    def num_of_blocked_sp(self):
+        return User.query.filter_by(status='Blocked').count()
+    @property
+    def num_of_active_customers(self):
+        return User.query.filter_by(status='Active').count()
+    @property
+    def num_of_blocked_users(self):
+        return User.query.filter_by(status='Blocked').count()
+
+    @property 
+    def users_more_than_last_month(self):
+        return User.query.filter(User.date_created > datetime.now() - timedelta(days=30)).count()
+
+    @property
+    def pending_requests(self):
+        return ServiceRequest.query.filter_by(service_status='requested').count()
+    
+    @property
+    def pending_approval(self):
+        return User.query.filter_by(status='Pending Approval').count()
+
+    
+    
         
 
 class Role(db.Model, RoleMixin):

@@ -27,7 +27,9 @@ export default {
       handleSearch() {
         if (this.searchQuery.trim()) {
           // Handle the search action here
+          this.$emit("search", this.searchQuery);
           console.log("Searching for:", this.searchQuery);
+
         }
       },
     },

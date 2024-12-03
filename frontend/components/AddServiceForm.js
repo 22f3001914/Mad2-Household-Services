@@ -4,12 +4,21 @@ export default {
       <h2 class="form-title">Add a New Service</h2>
 
       <input type="text" v-model="service.name" class="input-field" placeholder="Service Name" required />
-      <input type="number" v-model="service.base_price" class="input-field" step="0.01" placeholder="Base Price" required />
-      <input type="text" v-model="service.time_required" class="input-field" placeholder="Time Required (e.g., 1 hour)" />
-      <textarea v-model="service.description" class="input-field" placeholder="Enter service description"></textarea>
-      <input type="file" @change="onFileChange" class="input-field" />
+      <span v-if="errors.name" class="error-message">{{ errors.name }}</span>
 
-      <button @click="registerService" class="submit-button">
+      <input type="number" v-model="service.base_price" class="input-field" step="0.01" placeholder="Base Price" required />
+      <span v-if="errors.base_price" class="error-message">{{ errors.base_price }}</span>
+
+      <input type="text" v-model="service.time_required" class="input-field" placeholder="Time Required (e.g., 1 hour)" />
+      <span v-if="errors.time_required" class="error-message">{{ errors.time_required }}</span>
+
+      <textarea v-model="service.description" class="input-field" placeholder="Enter service description"></textarea>
+      <span v-if="errors.description" class="error-message">{{ errors.description }}</span>
+
+      <input type="file" @change="onFileChange" class="input-field" />
+      <span v-if="errors.image" class="error-message">{{ errors.image }}</span>
+
+      <button @click="validateForm" class="submit-button">
         <i class="bi bi-check-circle login-icon mr-2"></i> Add Service
       </button>
     </div>
@@ -22,12 +31,35 @@ export default {
                 time_required: '',
                 description: '',
                 image: null
-            }
+            },
+            errors: {}
         };
     },
     methods: {
         onFileChange(e) {
             this.service.image = e.target.files[0];
+        },
+        validateForm() {
+            this.errors = {};
+
+            if (!this.service.name) {
+                this.errors.name = 'Service name is required.';
+            }
+            if (!this.service.base_price) {
+                this.errors.base_price = 'Base price is required.';
+            } else if (isNaN(this.service.base_price) || this.service.base_price <= 0) {
+                this.errors.base_price = 'Base price must be a positive number.';
+            }
+            if (!this.service.time_required) {
+                this.errors.time_required = 'Time required is required.';
+            }
+            if (!this.service.description) {
+                this.errors.description = 'Description is required.';
+            }
+
+            if (Object.keys(this.errors).length === 0) {
+                this.registerService();
+            }
         },
         async registerService() {
             const formData = new FormData();

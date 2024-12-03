@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            color: #333;
+            background-color: #f9f9f9;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: #ffffff;
+        }
+        .header {
+            text-align: center;
+            background-color: #333;
+            color: white;
+            padding: 10px 0;
+            border-radius: 8px 8px 0 0;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        .section h3 {
+            color: #333;
+            border-bottom: 2px solid #333;
+            padding-bottom: 5px;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        .table th, .table td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        .table th {
+            background-color: #f1f1f1;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #666;
+        }
+        .highlight {
+            font-weight: bold;
+            color:#333;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>Home Hero Monthly Activity Report</h2>
+        </div>
+        <div class="section">
+            <h3>Basic Information</h3>
+            <p><strong>Name:</strong> {{ user_name }}</p>
+            <p><strong>Email:</strong> {{ user_email }}</p>
+            <p><strong>Account Status:</strong> {{ account_status }}</p>
+        </div>
+        <div class="section">
+            <h3>Service Summary</h3>
+            <p><strong>Total Requests:</strong> <span class="highlight">{{ total_requests }}</span></p>
+            <p><strong>Completed:</strong> <span class="highlight">{{ completed_requests }}</span></p>
+            <p><strong>Pending:</strong> <span class="highlight">{{ pending_requests }}</span></p>
+        </div>
+        <div class="section">
+            <h3>Request Details</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Date</th>
+                        <th>Service</th>
+                        <th>Professional</th>
+                        <th>Status</th>
+                        <th>Rating</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for request in request_details %}
+                    <tr>
+                        <td>{{ request.id }}</td>
+                        <td>{{ request.date }}</td>
+                        <td>{{ request.service_name }}</td>
+                        <td>{{ request.professional_name }}</td>
+                        <td>{{ request.status }}</td>
+                        <td>{{ request.rating }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="section">
+            <h3>Activity Timeline</h3>
+            <ul>
+                {% for activity in activity_timeline %}
+                <li>{{ activity.date }}: {{ activity.description }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="footer">
+            <p>Thank you for choosing Home Hero. If you have any questions or feedback, feel free to reach out to our support team.</p>
+            <p>Stay connected,</p>
+            <p><strong>The Home Hero Team</strong></p>
+        </div>
+    </div>
+</body>
+</html>

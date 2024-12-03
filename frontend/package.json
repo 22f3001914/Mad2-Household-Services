@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "toaster-js": "^2.2.3",
+    "vue-sonner": "^1.3.0"
+  }
+}

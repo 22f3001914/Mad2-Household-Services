@@ -5,7 +5,7 @@ from flask import request, jsonify, render_template, send_file
 from backend.models import db
 from datetime import datetime
 from celery.result import AsyncResult
-from backend.celery.tasks import create_csv
+from backend.celery.tasks import create_csv, send_welcome_msg_user, send_welcome_msg_sp, send_export_complete_mail
 import os
 
 datastore = app.security.datastore
@@ -35,7 +35,9 @@ def get_celery_data(task_id):
     else:
         return {'message' : 'task not ready'}, 405
     
-
+@app.get('/html')
+def html():
+    return render_template('/templates/monthly_activity_report.html')
 
 @app.get('/')
 def home():
@@ -118,6 +120,10 @@ def register():
             status = status
         )
         db.session.commit()
+        if role_name == 'professional':
+            send_welcome_msg_sp.delay(email, name)
+        else:
+            send_welcome_msg_user.delay(email, name)
         return jsonify({"Message": "Registration successful"}), 200
     except Exception as err:
         db.session.rollback()

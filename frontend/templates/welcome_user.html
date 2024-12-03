@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .header {
+            background-color: #333;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .section {
+            padding: 20px;
+        }
+        .section h2 {
+            color: #333;
+            margin-top: 0;
+            border-bottom: 2px solid #333;
+            padding-bottom: 5px;
+            font-size: 20px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #e60023;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        .footer {
+            background-color: #f1f1f1;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Welcome to Home Hero!</h1>
+        </div>
+        <div class="section">
+            <h2>Hello {{ user_name }},</h2>
+            <p>Thank you for joining Home Hero. We're excited to have you on board and are committed to providing you with the best service experience possible.</p>
+            <p>With Home Hero, you can easily book trusted professionals for various services tailored to your needs. Explore our offerings and discover how we can simplify your day-to-day life.</p>
+        
+        <div class="section">
+            <h2>Getting Started</h2>
+            <ul>
+                <li>Browse services available in your area.</li>
+                <li>Book appointments quickly and easily through our platform.</li>
+                <li>Manage your bookings and track the status of your requests in real time.</li>
+            </ul>
+            <p>If you have any questions or need assistance, feel free to reach out to our support team. We are here to help!</p>
+        </div>
+        <div class="footer">
+            <p>Thank you for choosing Home Hero. We look forward to serving you.</p>
+            <p><strong>The Home Hero Team</strong></p>
+        </div>
+    </div>
+</body>
+</html>

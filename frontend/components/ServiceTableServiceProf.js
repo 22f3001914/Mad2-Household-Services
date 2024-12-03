@@ -1,8 +1,9 @@
 export default {
   data() {
     return {
-      serviceRequests: [], 
+      serviceRequests: [],
       searchQuery: "",
+      searchCriteria: "service_name", // Default search criteria
     };
   },
   created() {
@@ -72,7 +73,7 @@ export default {
     },
     async closeRequest(request) {
       try {
-        const response = await fetch(`/api/service_request_records/`+request.id +"/completed", {
+        const response = await fetch(`/api/service_request_records/`+request.id +"/completedbysp", {
           method: 'PUT',
           headers: {
             'Authentication-Token': this.$store.state.auth_token,
@@ -94,19 +95,29 @@ export default {
   },
   computed: {
     filteredRequests() {
-      return this.serviceRequests.filter((request) =>
-        request.service_name
-          .toLowerCase()
-          .includes(this.searchQuery.toLowerCase())
-      );
+      return this.serviceRequests.filter((request) => {
+        const matchesSearch = this.searchCriteria === 'service_name'
+          ? request.service_name.toLowerCase().includes(this.searchQuery.toLowerCase())
+          : this.searchCriteria === 'status'
+          ? request.status.toLowerCase().includes(this.searchQuery.toLowerCase())
+          : this.searchCriteria === 'date'
+          ? new Date(request.date_of_request).toLocaleDateString().includes(this.searchQuery)
+          : true;
+        return matchesSearch;
+      });
     },
   },
   template: `
     <div class="admin-service-table">
       <div class="admin-header">
+        <select v-model="searchCriteria" class="admin-search-criteria">
+          <option value="service_name">Service Name</option>
+          <option value="status">Status</option>
+          <option value="date">Request Date</option>
+        </select>
         <input
           type="text"
-          placeholder="Search requests..."
+          placeholder="Search..."
           v-model="searchQuery"
           class="admin-search-bar"
         />
@@ -149,9 +160,6 @@ export default {
               >
                 Close
               </button>
-              <span v-else>
-                {{ request.status }}
-              </span>
             </td>
           </tr>
         </tbody>

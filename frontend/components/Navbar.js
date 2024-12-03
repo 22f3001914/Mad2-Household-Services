@@ -26,17 +26,20 @@ export default {
           <router-link class="nav-link" to="/">Home</router-link>
         </li>
         <li class="nav-item">
-          <router-link class="nav-link" to="/services">Services</router-link>
+          <router-link v-if="$store.state.loggedIn && $store.state.role === 'user'" class="nav-link" to="/my-services">My Services</router-link>
         </li>
         <li class="nav-item">
-          <router-link class="nav-link" to="/about">About</router-link>
+          <router-link v-if="!$store.state.loggedIn" class="nav-link" to="/careers">Careers</router-link>
         </li>
+
         <li class="nav-item">
           <router-link class="nav-link" to="/contact">Contact</router-link>
         </li>
         <li class="nav-item">
-        <router-link v-if="$store.state.loggedIn && $store.state.role === 'admin'" class="nav-link" to="/admin-dashboard">Admin Dashboard</router-link>
+          <router-link v-if="$store.state.loggedIn && $store.state.role === 'user'" class="nav-link" to="/my-profile">Profile</router-link>
         </li>
+
+
       </ul>
     </div>
 

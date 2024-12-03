@@ -4,11 +4,11 @@ import AdminDashboardOverview from "../components/AdminDashboardOverview.js";
 import SideBar from "../components/SideBar.js";
 import Usertable from "../components/Usertable.js";
 import NewServiceTable from "../components/NewServiceTable.js";
+import AllServices from "../components/AllServices.js";
 
 export default {
   template: `
     <div id="admin-page">
-
       <SideBar @page-changed="changePage" />
       <div class="admin-main-content">
         <component :is="currentComponent"></component>
@@ -22,6 +22,7 @@ export default {
     SideBar,
     Usertable,
     NewServiceTable,
+    AllServices
   },
   data() {
     return {
@@ -34,7 +35,8 @@ export default {
       const pageComponentMap = {
         'overview': 'AdminDashboardOverview',
         'user-management': 'Usertable',
-        'service-management': 'NewServiceTable'
+        'service-management': 'NewServiceTable',
+        'service-request': 'AllServices',
       };
       this.currentComponent = pageComponentMap[page];
     }

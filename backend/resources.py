@@ -5,10 +5,17 @@ from backend.models import Service, ServiceRequest, db, User, ServiceRequestReco
 from datetime import datetime
 from werkzeug.utils import secure_filename
 from flask import current_app as app
+from backend.celery.tasks import send_approval_msg_sp, send_block_msg, send_reject_msg_sp, send_unblock_msg, send_export_complete_mail
 import os 
 cache = app.cache
 
 api = Api(prefix='/api')
+
+IMAGE_UPLOAD_FOLDER = 'frontend/static/images'
+RESUME_UPLOAD_FOLDER = 'frontend/static/resume'
+os.makedirs(IMAGE_UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(RESUME_UPLOAD_FOLDER, exist_ok=True)
+
 
 # Define the structure for marshaling Service fields
 service_fields = {
@@ -36,6 +43,9 @@ service_request_fields = {
     'service_status': fields.String,
     'remarks': fields.String,
     'rating': fields.Integer,
+    'customer_name': fields.String(attribute=lambda x: x.customer.name),
+    'service_name': fields.String(attribute=lambda x: x.service.name),
+    'professional_name': fields.String(attribute=lambda x: x.professional.name if x.professional else "Not Assigned"),
 }
 
 # Define the structure for marshaling User fields
@@ -60,7 +70,41 @@ user_fields = {
     'role': fields.String(attribute=lambda x: get_user_role(x)),
     'active': fields.Boolean,
     'status': fields.String,
+    'rating' : fields.Float,
+
 }
+
+admin_dashboard__stats_fields = {
+    'total_users' : fields.Integer,
+    'num_of_sp'  : fields.Integer,
+    'num_of_customers' : fields.Integer,
+    'num_of_services' : fields.Integer,
+    'num_of_requests' : fields.Integer,
+    'num_of_completed_requests' : fields.Integer,
+    'num_of_assigned_requests' : fields.Integer,
+    'num_of_active_requests' : fields.Integer,
+    'num_of_reviews' : fields.Integer,
+    'num_of_blocked_users' : fields.Integer,
+    'num_of_active_customers' : fields.Integer,
+    'num_of_active_sp' : fields.Integer,
+    'users_more_than_last_month' : fields.Integer,
+    'pending_requests' : fields.Integer,
+    'pending_approvals' : fields.Integer,
+
+}
+
+class AdminDashboardStats(Resource):
+    @auth_required('token')
+    @cache.memoize(timeout=5)
+    @marshal_with(admin_dashboard__stats_fields)
+    def get(self):
+        admin = User.query.get(current_user.id)
+        if not admin.is_admin:
+            return {"message": "Unauthorized"}, 403
+        return admin
+api.add_resource(AdminDashboardStats, '/admin_dashboard_stats')
+
+
 class ServiceAPI(Resource):
     # @auth_required('token')
     @cache.memoize(timeout=5)
@@ -279,9 +323,6 @@ def notify_professional(service_req_id, professional_id=None):
         db.session.add(new_request)
     db.session.commit()
 
-
-
-
 class ServiceRequestRecordAPI(Resource):
     @auth_required('token')
     def get(self):
@@ -303,7 +344,7 @@ class ServiceRequestRecordAPI(Resource):
     @auth_required('token')
     def put(self, record_id, action):
 
-        if action in ["accept", "reject"]:
+        if action in ["accept", "reject","completedbysp"]:
             record = ServiceRequestRecord.query.get(record_id)
             if not record:
                 return {"message": "Record not found"}, 404
@@ -341,21 +382,26 @@ class ServiceRequestRecordAPI(Resource):
                     service_request.service_status = "All rejected"
                 db.session.commit()
                 return {"message": "Request rejected"}, 200
+            elif action =="completedbysp":
+                record.status = "Completed"
+                service_request = ServiceRequest.query.get(record.service_request_id)
+                service_request.service_status = "Completed"
+                service_request.date_of_completion = datetime.now()
+                professional = User.query.get(current_user.id)
+                professional.status = "Active"
+                db.session.commit()
+                return {"message": "Request completed"}, 200
+            
+
             else:
                 return {"message": "Invalid action"}, 400
             
         elif action == "completed":
             service_id = record_id
             service = ServiceRequest.query.get(service_id)
-            professional_id = service.professional_id
             if not service:
                 return {"message": "Service request not found"}, 404
-            records = service.records
-            this_record = None
-            for record in records:
-                if record.service_request_id == service_id and record.professional_id == professional_id:
-                    this_record = record
-                    break
+            this_record = ServiceRequestRecord.query.filter_by(service_request_id=service_id).first()
             user = User.query.get(current_user.id)
             if user.is_service_professional():
                 user.status = "Active"
@@ -368,7 +414,7 @@ class ServiceRequestRecordAPI(Resource):
             db.session.commit()
             return {"message": "Request completed"}, 200
         elif action == "cancel":
-                record = ServiceRequestRecord.query.get(record_id)
+                record = ServiceRequestRecord.query.filter_by(service_request_id=record_id).first()
                 if not record:
                     return {"message": "Record not found"}, 404
                 record.status = "Cancelled"
@@ -379,7 +425,7 @@ class ServiceRequestRecordAPI(Resource):
                 service_request = ServiceRequest.query.get(record.service_request_id)
                 service_request.service_status = "Cancelled"
                 db.session.commit()
-                return {"message": "Request accepted"}, 200
+                return {"message": "Request Cancelled"}, 200
         else:
             return {"message": "Invalid action"}, 400
     
@@ -429,6 +475,7 @@ class BasicFrontendRequirements(Resource):
 
 
 class GetAllReviewsAndRating(Resource):
+    @cache.cached(timeout=10, key_prefix='all_reviews_and_ratings_%s')
     def get(self, service_id):
         # Query to get the customer name, rating, and remarks for the given service_id
         reviews = db.session.query(
@@ -482,6 +529,59 @@ class GetAllUser(Resource):
     def get(self):
         users = User.query.all()
         return [user for user in users if get_user_role(user) is not None]
+    
+class UserAPI(Resource):
+    @auth_required('token')
+    @marshal_with(user_fields)
+    def get(self, user_id):
+        user = User.query.get(user_id)
+        if not user:
+            return {"message": "User not found"}, 404
+        return user
+    
+    @auth_required('token')
+    def put(self, user_id):
+        user = User.query.get(user_id)
+        if not user:
+            return {"message": "User not found"}, 404
+         # Access the form data
+        data = request.form
+        files = request.files
+
+        # Update user details from the form data
+        user.name = data.get("name", user.name)
+        user.location = data.get("location", user.location)
+        user.description = data.get("description", user.description)
+        user.service_type = data.get("service_type", user.service_type)
+        user.experience = data.get("experience", user.experience)
+         # Handle profile image upload
+        if "image" in files:
+            image = files["image"]
+            if image:
+                filename = secure_filename(image.filename)
+                image.save(os.path.join(IMAGE_UPLOAD_FOLDER, filename))
+                user.image = filename
+
+        # Handle resume upload
+        if "resume" in files:
+            resume = files["resume"]
+            if resume:
+                filename = secure_filename(resume.filename)
+                resume.save(os.path.join(RESUME_UPLOAD_FOLDER, filename))
+                user.resume = filename
+
+        # Save changes to the database
+        try:
+            db.session.commit()
+            return {"message": "User updated successfully"}, 200
+        except Exception as e:
+            db.session.rollback()
+            return {"message": "An error occurred while updating the user", "error": str(e)}, 500
+
+
+    
+api.add_resource(UserAPI, '/users/<int:user_id>')
+
 
 class BlockUser(Resource):
     @auth_required('token')
@@ -495,6 +595,7 @@ class BlockUser(Resource):
 
         user.active = False
         user.status = "Blocked"
+        send_block_msg.delay(user.email, user.name)
         db.session.commit()
         return {"message": "User blocked"}, 200
 
@@ -519,7 +620,26 @@ class UnBlockUser(Resource):
                 notify_professional(service.id, user_id)
         
         db.session.commit()
+        if user.is_service_professional() and user.status == "Approval Pending":
+            send_approval_msg_sp.delay(user.email, user.name)
+        else:
+        
+            send_unblock_msg.delay(user.email, user.name)
         return {"message": "User Unblocked"}, 200
+    
+class RejectServiceProfessionalAPI(Resource):
+    @auth_required('token')
+    def put(self, user_id):
+        user = User.query.get(user_id)
+        if not user:
+            return {"message": "User not found"}, 404
+
+        if not current_user.is_admin:
+            return {"message": "Unauthorized"}, 403
+        user.status = "Rejected"
+        db.session.commit()
+        send_reject_msg_sp.delay(user.email, user.name)
+        return {"message": "User rejected"}, 200
     
 class MyRequestedServicesAPI(Resource):
     @auth_required('token')
@@ -538,11 +658,23 @@ class MyRequestedServicesAPI(Resource):
         ]
         return jsonify(response_data)    
 
+class MyCompletedServices(Resource):
+    @cache.cached(timeout=10, key_prefix='completed_services%s')
+    @auth_required('token')
+    @marshal_with(service_request_fields)
+    def get(self):
+        service_requests = ServiceRequest.query.filter(
+            ServiceRequest.professional_id == current_user.id,
+            ServiceRequest.service_status.in_(['Completed', 'Reviewed'])
+        ).order_by(ServiceRequest.date_of_completion.desc()).all()
+        return service_requests
+    
+api.add_resource(MyCompletedServices, '/my_completed_services')
 
 
 api.add_resource(MyRequestedServicesAPI, '/my_requested_services')
 
-    
+api.add_resource(RejectServiceProfessionalAPI, '/reject_service_professional/<int:user_id>')
 # Register resources with endpoints
 api.add_resource(GetAllUser, '/users')
 api.add_resource(GetAllReviewsAndRating, '/reviews/<int:service_id>')
@@ -553,7 +685,7 @@ api.add_resource(UnBlockUser, '/unblock_user/<int:user_id>')
 # Register resources with endpoints
 api.add_resource(ServiceAPI, '/services/<int:service_id>', '/services')  # `/services` added for POST
 api.add_resource(ServiceRequestAPI, '/service_requests/<int:request_id>','/service_requests')
-api.add_resource(ServiceRequestListAPI, '/service_requests123')
+api.add_resource(ServiceRequestListAPI, '/get_all_requests')
 
 
 

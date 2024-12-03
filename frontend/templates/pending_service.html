@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .header {
+            background-color: #333;
+            color: #ffffff;
+            text-align: center;
+            padding: 20px;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .section {
+            padding: 20px;
+        }
+        .section h2 {
+            color: #333;
+            margin-top: 0;
+            border-bottom: 2px solid #333;
+            padding-bottom: 5px;
+            font-size: 20px;
+        }
+        .footer {
+            background-color: #f1f1f1;
+            padding: 10px;
+            text-align: center;
+            font-size: 0.9em;
+            color: #666;
+        }
+        a {
+            color: #d9534f;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Pending Service Request Notification</h1>
+        </div>
+        <div class="section">
+            <h2>Hello {{ service_professional_name }},</h2>
+            <p>You have a <strong>pending service request</strong> awaiting your action on Home Hero. To view the details and respond to the request, please visit your dashboard.</p>
+            <p>Timely response to service requests ensures a smooth experience for our customers and helps you manage your schedule efficiently.</p>
+        </div>
+        <div class="section">
+            <h2>Next Steps</h2>
+            <ul>
+                <li>Log in to your Home Hero account.</li>
+                <li>Navigate to the <strong>Dashboard</strong> to view the pending service request.</li>
+                <li>Take the necessary action to confirm or reschedule the service.</li>
+            </ul>
+            <p>We appreciate your prompt attention to this matter and your continued commitment to providing excellent service.</p>
+        </div>
+        <div class="footer">
+            <p>If you need any assistance or have questions, please reach out to our support team at <a href="mailto:support@homehero.com">support@homehero.com</a>.</p>
+            <p><strong>The Home Hero Team</strong></p>
+        </div>
+    </div>
+</body>
+</html>
